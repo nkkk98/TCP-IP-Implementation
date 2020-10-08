@@ -20,7 +20,7 @@ class StreamReassembler {
     bool _empty;
     size_t unassem_num;
     size_t needindex;
-    std::vector<size_t> iterdelete(const size_t index,const size_t num);
+    size_t iterdelete(const size_t index,const size_t num);
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
     //! \note This capacity limits both the bytes that have been reassembled,

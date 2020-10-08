@@ -13,12 +13,15 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 StreamReassembler::StreamReassembler(const size_t capacity) :leftdata({}),leftindex({}),lefteof({}),_output(capacity), _capacity(capacity),_empty(false),unassem_num(0),needindex(0){}
-
-std::vector<size_t> StreamReassembler::iterdelete(const size_t index,const size_t num){
+//Discription:delete characters in unassemble array to store the newest characters could be assembled. if the unassemble num is not enough,cut the present string.
+//Parameter: 
+//index:index of head unassemble array member that can be erased or cut
+//num: count of place that should be delete.
+//Return: number of the present string need to be cut
+size_t StreamReassembler::iterdelete(const size_t index,const size_t num){
 	size_t iter=leftindex.size()-1;
 	size_t delnum=num;
-	size_t eof=lefteof[iter];
-	if(index>=leftindex.size())return {num,eof};
+	if(index>=leftindex.size())return num;
 	while(iter>=index){
 		if(delnum>=leftdata[iter].length()){
 			delnum-=leftdata[iter].length();
@@ -30,7 +33,8 @@ std::vector<size_t> StreamReassembler::iterdelete(const size_t index,const size_
 		}else{
 			size_t needsize=leftdata[iter].length()-delnum;
 			leftdata[iter]=leftdata[iter].substr(0,needsize);
-			lefteof[iter]=eof;
+			//if the last string with eof=true is cutted,the corresponding eof should be false;
+			lefteof[iter]=false;
 			unassem_num-=delnum;
 			delnum=0;
 			break;
@@ -38,14 +42,14 @@ std::vector<size_t> StreamReassembler::iterdelete(const size_t index,const size_
 		
 	}
 
-	return {delnum,eof};
+	return delnum;
 
 }
 //! \details This function accepts a substring (aka a segment) of bytes,
 //! possibly out-of-order, from the logical stream, and assembles any newly
 //! contiguous substrings and writes them into the output stream in order.
 void StreamReassembler::push_substring(const string &data, const size_t index, const bool eof) {
-   // DUMMY_CODE(data, index, eof);
+   // if string has porbability to be assembled,we should judge if this string already included in ByteSream
    if(index<=needindex){
      size_t trueindex=needindex-index;
      if(static_cast<long unsigned int>(trueindex)>=data.length()&&data!="")return;
@@ -57,6 +61,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
      size_t lastindex=index+data.length()-1;
      size_t k=0;
      size_t originlength=needsize;
+     //delete the overlapping characters between this string and string has been stored in unassembled array.
      while(k<leftindex.size()){
      	if(leftindex[k]>lastindex)break;
 	else if(leftindex[k]+leftdata[k].length()-1<=lastindex){
@@ -75,20 +80,20 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 	}
      
      }
-     std::vector<size_t> cut;
- 
+     size_t cut;
+     //if the space is not enough,delete some characters or cut the string itself.
      if(needsize>maxsize){
-     	cut=iterdelete(k,maxsize-needsize);
-	if(cut[0]!=0){
-		needsize-=cut[0];
-		originlength-=cut[0];
-		_eof=cut[1];
+     	cut=iterdelete(k,needsize-maxsize);
+	if(cut!=0){
+		needsize-=cut;
+		originlength-=cut;
 	}
      }
      needdata=needdata.substr(0,originlength);
      _output.write(needdata);
      needindex+=originlength;
      }
+     //if _eof=true and there is no posibility to assemble any characters ,end the input.
      if(_eof){
 	if(leftindex.size()==0){_empty=true;
 	    _output.end_input();
@@ -99,6 +104,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 	    }
 	    }
      }
+     //if is not end,iterately call push_substring function to push unassebled array member
      if(!_empty){
        if(leftindex.size()>0){
          if(leftindex[0]<=needindex){
@@ -107,6 +113,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 		 bool tmpeof=lefteof[0];
 		 leftdata.erase(leftdata.begin());
 		 leftindex.erase(leftindex.begin());
+		 lefteof.erase(lefteof.begin());
 		 unassem_num-=tmpleft.length();
 		 push_substring(tmpleft,tmpindex,tmpeof);
        }
@@ -126,6 +133,8 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 	    if(leftindex[i]>=index)break;
 	    else i++;
 	}
+	bool _eof=eof;
+	//calculate overlapping characters with earlier member,then push back directly
 	if(i==leftindex.size()){
 	    size_t newindex=index;
 	    if(i>0){
@@ -133,15 +142,18 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 	       if(index+data.length()-1>=newindex){
 		    storedata=data.substr(newindex-index);
 		    needsize=needsize>storedata.length()?storedata.length():needsize;
+		    if(needsize<storedata.length())_eof=false;
 		    storedata=storedata.substr(0,needsize);
+
 	       }else return;
 	    }
 	    leftindex.push_back(newindex);
 	    leftdata.push_back(storedata);
-	    lefteof.push_back(eof);
+	    lefteof.push_back(_eof);
 	    unassem_num+=needsize;
 	    return;
 	}
+	//calculate overlapping characters with earlier and later member
 	if(i<leftindex.size()){
 		size_t newindex=index;
 		if(i>0){
@@ -173,14 +185,12 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 				break;
 			}
 		}
-		std::vector<size_t> cut;
-		bool _eof=eof;
+		size_t cut;
 		if(extra>maxsize){
-			cut=iterdelete(j,maxsize-extra);
-			if(cut[0]!=0){
-				extra-=cut[0];
-				originlength-=cut[0];
-				_eof=cut[1];		
+			cut=iterdelete(j,extra-maxsize);
+			if(cut!=0){
+				extra-=cut;
+				originlength-=cut;	
 			}
 		}
 		storedata=storedata.substr(0,originlength);
