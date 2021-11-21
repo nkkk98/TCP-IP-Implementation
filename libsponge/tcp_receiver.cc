@@ -42,15 +42,15 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {/*
                     if(last_assem+1==fin_abs_seq)last_assem++;
 	    }
     }
-    /*
+    /////
     if(read_isn&&header.seqno>this->ackno()){
         const uint64_t absolute_seqno=unwrap(header.seqno+header.syn,isn,last_assem);   
 
     }
-    /*
+    
     return true;*/
     uint64_t old_abs_ackno = 0;
-    if (isn.has_value()) {
+    if (read_isn) {
         old_abs_ackno = abs_ackno();
     }
     // Deal with the first SYN
