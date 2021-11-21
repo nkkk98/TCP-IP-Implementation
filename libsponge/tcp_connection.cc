@@ -53,6 +53,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
 bool TCPConnection::active() const { 
     if (_receiver.stream_out().error() || _sender.stream_in().error()) {
         return false;
+    }
     if (_receiver.stream_out().eof() && _sender.stream_in().eof() && _sender.bytes_in_flight() == 0 &&!has_new_ackno()) {
         if (_linger_after_streams_finish && _time_since_last_segment_received < 10 * _cfg.rt_timeout) {
             return true;
