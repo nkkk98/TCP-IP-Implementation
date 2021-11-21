@@ -12,7 +12,7 @@ class TCPConnection {
     TCPConfig _cfg;
     TCPReceiver _receiver{_cfg.recv_capacity};
     TCPSender _sender{_cfg.send_capacity, _cfg.rt_timeout, _cfg.fixed_isn};
-
+    size_t _time_since_last_segment_received;
     //! outbound queue of segments that the TCPConnection wants sent
     std::queue<TCPSegment> _segments_out{};
 
@@ -21,6 +21,13 @@ class TCPConnection {
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
 
+    std::optional<WrappingInt32> _last_ackno_sent;
+
+    bool updateSender();
+
+    void sendSegments();
+
+    void reset();
   public:
     //! \name "Input" interface for the writer
     //!@{
@@ -81,7 +88,7 @@ class TCPConnection {
     //!@}
 
     //! Construct a new connection from a configuration
-    explicit TCPConnection(const TCPConfig &cfg) : _cfg{cfg} {}
+    explicit TCPConnection(const TCPConfig &cfg) : _cfg{cfg}, _time_since_last_segment_received(0), _last_ackno_sent(std::nullopt) {}
 
     //! \name construction and destruction
     //! moving is allowed; copying is disallowed; default construction not possible
