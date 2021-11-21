@@ -55,7 +55,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {/*
     }
     // Deal with the first SYN
     if (seg.header().syn && !read_isn) {
-        isn = make_optional<WrappingInt32>(seg.header().seqno);
+        isn = seg.header().seqno;
     }
 
     if (!read_isn) {
