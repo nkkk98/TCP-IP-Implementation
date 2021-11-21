@@ -106,7 +106,7 @@ void sendSegments(){
     }
 }
 
-bool TCPConnection::has_new_ackno(){
+bool TCPConnection::has_new_ackno()const {
     return _receiver.ackno().has_value()&&(!_last_ackno_sent.has_value()||(_last_ackno_sent.value()!=_receiver.ackno().value()));
 }
 //! \param[in] ms_since_last_tick number of milliseconds since the last call to this method

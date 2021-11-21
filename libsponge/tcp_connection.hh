@@ -29,7 +29,7 @@ class TCPConnection {
 
     void reset();
 
-    bool has_new_ackno();
+    bool has_new_ackno() const;
   public:
     //! \name "Input" interface for the writer
     //!@{
