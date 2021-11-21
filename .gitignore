@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.a
 *.o
 /build
@@ -7,3 +8,7 @@ Makefile
 cmake_install.cmake
 CTestTestfile.cmake
 compile_commands.json
+=======
+/build
+/.ccls-cache
+>>>>>>> public/lab4-startercode
