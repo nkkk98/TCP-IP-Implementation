@@ -12,7 +12,7 @@ using namespace std;
 
 bool TCPReceiver::segment_received(const TCPSegment &seg) {
     uint64_t old_abs_ackno = 0;
-    if (isn.has_value()) {
+    if (read_isn) {
         old_abs_ackno = abs_ackno();
     }
     TCPHeader header=seg.header();
@@ -22,7 +22,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
 	    isn=header.seqno;
             read_isn=true;
     }
-    if (!isn.has_value()) {
+    if (!read_isn) {
         return false;
     }
 
