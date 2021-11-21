@@ -91,7 +91,7 @@ bool TCPConnection::updateSender(){
     return false;
 }
 
-void sendSegments(){
+void TCPConnection::sendSegments(){
     if(!active())return;
     while(_sender.segments_out().size()){
         auto seg=_sender.segments_out().front();
