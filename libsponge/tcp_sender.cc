@@ -74,14 +74,14 @@ void TCPSender::fill_window() {
 
 //! \param ackno The remote receiver's ackno (acknowledgment number)
 //! \param window_size The remote receiver's advertised window size
-void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_size) {
+bool TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_size) {
 	uint64_t abs_ackno=unwrap(ackno,_isn,_next_seqno);
-	if(abs_ackno>_next_seqno)return;//fault consequnce
+	if(abs_ackno>_next_seqno)return false;//fault consequnce
 	
 	windowsize=window_size;
 	windowedge=abs_ackno+windowsize;
 
-	if(abs_ackno<=_abs_ackno)return;//already acknowledged
+	if(abs_ackno<=_abs_ackno)return false;//already acknowledged
 
 	_RTO=_initial_retransmission_timeout;
 	_timer=_RTO;
@@ -103,7 +103,7 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
 	
 	_abs_ackno=abs_ackno;
 
-
+	return true;
 }
 
 //! \param[in] ms_since_last_tick the number of milliseconds since the last call to this method

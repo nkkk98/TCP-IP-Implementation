@@ -28,6 +28,8 @@ class TCPConnection {
     void sendSegments();
 
     void reset();
+
+    bool has_new_ackno();
   public:
     //! \name "Input" interface for the writer
     //!@{

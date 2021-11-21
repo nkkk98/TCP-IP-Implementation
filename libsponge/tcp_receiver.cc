@@ -10,7 +10,11 @@ void DUMMY_CODE(Targs &&...  unused ) {}*/
 
 using namespace std;
 
-void TCPReceiver::segment_received(const TCPSegment &seg) {
+bool TCPReceiver::segment_received(const TCPSegment &seg) {
+    uint64_t old_abs_ackno = 0;
+    if (isn.has_value()) {
+        old_abs_ackno = abs_ackno();
+    }
     TCPHeader header=seg.header();
     Buffer payload=seg.payload();
     const string data= payload.copy();
@@ -18,9 +22,19 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
 	    isn=header.seqno;
             read_isn=true;
     }
-    
+    if (!isn.has_value()) {
+        return false;
+    }
+
+    uint64_t old_window_size = window_size();
+    const uint64_t abs_seqno=unwrap(header.seqno+header.syn, isn, last_assem);
+    if (!(abs_seqno < old_abs_ackno + old_window_size && abs_seqno + seg.length_in_sequence_space() > old_abs_ackno)) {
+        // Not overlap with the window. but if it's a ack only, it's accepted.
+        return seg.length_in_sequence_space() == 0 && abs_seqno == old_abs_ackno;
+    }
+
     if(read_isn&&(this->ackno()||last_assem==0)){
-	    const uint64_t abs_seqno=unwrap(header.seqno+header.syn, isn, last_assem);
+	    
 	    if(header.fin)fin_abs_seq=abs_seqno+seg.length_in_sequence_space()-header.syn-header.fin; 
 	    _reassembler.push_substring(data, abs_seqno-1, header.fin);
 	    if(this->abs_ackno()==abs_seqno){
@@ -34,6 +48,7 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
 
     }
     */
+    return true;
 }
 
 uint64_t TCPReceiver::abs_ackno()const{
