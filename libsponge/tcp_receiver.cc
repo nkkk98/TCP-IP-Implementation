@@ -48,6 +48,11 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
     uint64_t stream_indices = abs_seqno > 0 ? abs_seqno - 1 : 0;
     _reassembler.push_substring(data, abs_seqno-1, stream_indices + seg.payload().size() + 2 == fin_abs_seq);
 
+    if(abs_ackno()==abs_seqno){
+		    last_assem=_reassembler.stream_out().bytes_written()+header.fin;//abs_seqno+seg.length_in_sequence_space()-header.syn-1;
+            if(last_assem+1==fin_abs_seq)last_assem++;
+	}
+
     return true;
     /*
     if(read_isn&&(this->ackno()||last_assem==0)){
