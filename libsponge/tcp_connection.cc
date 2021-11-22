@@ -43,7 +43,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
     }
 
     bool send=updateSender();
-    if(!send&&(seg.header().fin||invalid_ack||!segment_received||seg.length_in_sequence_space())&&(_sender.bytes_in_flight() != _sender.next_seqno_absolute())){
+    if(!send&&(seg.header().fin||invalid_ack||seg.length_in_sequence_space())&&(_sender.bytes_in_flight() != _sender.next_seqno_absolute())){
         _sender.send_empty_segment();
         sendSegments();
     }
@@ -116,11 +116,11 @@ void TCPConnection::tick(const size_t ms_since_last_tick) {
     if (_sender.consecutive_retransmissions() > TCPConfig::MAX_RETX_ATTEMPTS) {
         reset();
     }
-    /*
+    
     if (_time_since_last_segment_received >= 10 * _cfg.rt_timeout && !active()) {
         _linger_after_streams_finish = false;
     }
-    */
+    
     if (_sender.next_seqno_absolute() == 0) {  // should not send segment(SYN) when stream is not started.
         return;
     }
