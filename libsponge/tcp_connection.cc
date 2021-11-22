@@ -116,11 +116,11 @@ void TCPConnection::tick(const size_t ms_since_last_tick) {
     if (_sender.consecutive_retransmissions() > TCPConfig::MAX_RETX_ATTEMPTS) {
         reset();
     }
-
+    /*
     if (_time_since_last_segment_received >= 10 * _cfg.rt_timeout && !active()) {
         _linger_after_streams_finish = false;
     }
-
+    */
     if (_sender.next_seqno_absolute() == 0) {  // should not send segment(SYN) when stream is not started.
         return;
     }
