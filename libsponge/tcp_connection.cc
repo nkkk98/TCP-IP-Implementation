@@ -84,7 +84,7 @@ bool TCPConnection::updateSender(){
         _sender.send_empty_segment();
     }
 
-    if(nsegment){
+    if(_sender.segments_out().size()){
         sendSegments();
         return true;
     }
