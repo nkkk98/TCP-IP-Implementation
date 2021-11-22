@@ -35,7 +35,9 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         return true;
     }
     
-    if (!(abs_seqno > old_abs_ackno)){//abs_seqno < old_abs_ackno + old_window_size && abs_seqno + seg.length_in_sequence_space() > old_abs_ackno)) {
+    if(read_isn&&(this->ackno()>old_abs_ackno||last_assem==0))_reassembler.push_substring(data, abs_seqno-1, header.fin);
+
+    if (!(abs_seqno < old_abs_ackno + old_window_size && abs_seqno + seg.length_in_sequence_space() > old_abs_ackno)) {
         // Not overlap with the window. but if it's a ack only, it's accepted.
         return seg.length_in_sequence_space() == 0 && abs_seqno == old_abs_ackno;
     }
@@ -45,8 +47,6 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
     if (all_fill && seg.header().fin) {  // only when fin also fall in the window
         fin_abs_seq = abs_seqno + seg.length_in_sequence_space()-header.syn-header.fin;
     }
-
-    _reassembler.push_substring(data, abs_seqno-1, header.fin);
 
     if(abs_ackno()==abs_seqno){
 		    last_assem=_reassembler.stream_out().bytes_written()+header.fin;//abs_seqno+seg.length_in_sequence_space()-header.syn-1;
