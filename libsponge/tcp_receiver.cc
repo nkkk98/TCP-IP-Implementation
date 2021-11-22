@@ -11,10 +11,10 @@ void DUMMY_CODE(Targs &&...  unused ) {}*/
 using namespace std;
 
 bool TCPReceiver::segment_received(const TCPSegment &seg) {
-    /*uint64_t old_abs_ackno = 0;
+    uint64_t old_abs_ackno = 0;
     if (read_isn) {
         old_abs_ackno = abs_ackno();
-    }*/
+    }
     TCPHeader header=seg.header();
     Buffer payload=seg.payload();
     const string data= payload.copy();
@@ -28,34 +28,42 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
 
     
     const uint64_t abs_seqno=unwrap(header.seqno+header.syn, isn, last_assem);
-    //uint64_t old_window_size = window_size();
+    uint64_t old_window_size = window_size();
     // ACK after FIN should be received
     if (fin_abs_seq && abs_seqno >= fin_abs_seq && seg.length_in_sequence_space() == 0) {
         return true;
     }
-    /*
-    if (!(abs_seqno < old_abs_ackno + old_window_size && abs_seqno + seg.length_in_sequence_space() > old_abs_ackno)) {
+    
+    if (!(abs_seqno < old_abs_ackno + old_window_size && abs_seqno + seg.length_in_sequence_space() > old_abs_ackno || )) {
         // Not overlap with the window. but if it's a ack only, it's accepted.
         return seg.length_in_sequence_space() == 0 && abs_seqno == old_abs_ackno;
     }
-    */
+    
+    bool all_fill = abs_seqno + seg.length_in_sequence_space() <= old_abs_ackno + old_window_size;
+
+    if (all_fill && seg.header().fin) {  // only when fin also fall in the window
+        fin_abs_seq = abs_seq + seg.length_in_sequence_space();
+    }
+
+    uint64_t stream_indices = abs_seq > 0 ? abs_seq - 1 : 0;
+    std::string payload(seg.payload().copy());
+    _reassembler.push_substring(payload, stream_indices, stream_indices + seg.payload().size() + 2 == fin_abs_seq);
+
+    return true;
+    /*
     if(read_isn&&(this->ackno()||last_assem==0)){
 	    
 	    if(header.fin)fin_abs_seq=abs_seqno+seg.length_in_sequence_space()-header.syn-header.fin; 
 	    _reassembler.push_substring(data, abs_seqno-1, header.fin);
 	    if(this->abs_ackno()==abs_seqno){
 		    last_assem=_reassembler.stream_out().bytes_written()+header.fin;//abs_seqno+seg.length_in_sequence_space()-header.syn-1;
-                    if(last_assem+1==fin_abs_seq)last_assem++;
+            if(last_assem+1==fin_abs_seq)last_assem++;
 	    }
         return true;
     }
-    /*
-    if(read_isn&&header.seqno>this->ackno()){
-        const uint64_t absolute_seqno=unwrap(header.seqno+header.syn,isn,last_assem);   
 
-    }
-    */
     return false;
+    */
 }
 
 uint64_t TCPReceiver::abs_ackno()const{
