@@ -26,19 +26,19 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         return false;
     }
 
-    uint64_t old_window_size = window_size();
+    
     const uint64_t abs_seqno=unwrap(header.seqno+header.syn, isn, last_assem);
-
+    uint64_t old_window_size = window_size();
     // ACK after FIN should be received
     if (fin_abs_seq && abs_seqno >= fin_abs_seq && seg.length_in_sequence_space() == 0) {
         return true;
     }
-
+    /*
     if (!(abs_seqno < old_abs_ackno + old_window_size && abs_seqno + seg.length_in_sequence_space() > old_abs_ackno)) {
         // Not overlap with the window. but if it's a ack only, it's accepted.
         return seg.length_in_sequence_space() == 0 && abs_seqno == old_abs_ackno;
     }
-
+    */
     if(read_isn&&(this->ackno()||last_assem==0)){
 	    
 	    if(header.fin)fin_abs_seq=abs_seqno+seg.length_in_sequence_space()-header.syn-header.fin; 
