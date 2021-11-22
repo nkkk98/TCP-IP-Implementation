@@ -81,7 +81,7 @@ bool TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
 	windowsize=window_size;
 	windowedge=abs_ackno+windowsize;
 
-	if(abs_ackno<=_abs_ackno)return false;//already acknowledged
+	if(abs_ackno<=_abs_ackno)return ture;//already acknowledged
 
 	_RTO=_initial_retransmission_timeout;
 	_timer=_RTO;
