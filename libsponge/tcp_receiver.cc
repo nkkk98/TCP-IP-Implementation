@@ -43,10 +43,10 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
     bool all_fill = abs_seqno + seg.length_in_sequence_space() <= old_abs_ackno + old_window_size;
 
     if (all_fill && seg.header().fin) {  // only when fin also fall in the window
-        fin_abs_seq = abs_seq + seg.length_in_sequence_space();
+        fin_abs_seq = abs_seqno + seg.length_in_sequence_space();
     }
 
-    uint64_t stream_indices = abs_seq > 0 ? abs_seq - 1 : 0;
+    uint64_t stream_indices = abs_seqno > 0 ? abs_seqno - 1 : 0;
     std::string payload(seg.payload().copy());
     _reassembler.push_substring(payload, stream_indices, stream_indices + seg.payload().size() + 2 == fin_abs_seq);
 
