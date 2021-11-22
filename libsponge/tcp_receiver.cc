@@ -50,7 +50,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         _reassembler.push_substring(data, abs_seqno-1, header.fin);
     }
 
-    if(abs_ackno()==abs_seqno){
+    if(abs_ackno()>=abs_seqno){
 		    last_assem=_reassembler.stream_out().bytes_written()+header.fin;//abs_seqno+seg.length_in_sequence_space()-header.syn-1;
             if(last_assem+1==fin_abs_seq)last_assem++;
 	}
