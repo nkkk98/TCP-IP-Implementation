@@ -35,7 +35,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         return true;
     }
     
-    if(read_isn&&(abs_seqno>old_abs_ackno||last_assem==0)){
+    if(read_isn&&(old_abs_ackno||last_assem==0)){
         _reassembler.push_substring(data, abs_seqno-1, header.fin);
     }
 
