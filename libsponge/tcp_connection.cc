@@ -35,7 +35,8 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         return;
     }
 
-    bool segment_received = _receiver.segment_received(seg);
+    //bool segment_received = 
+    _receiver.segment_received(seg);
 
     // reset linger_after_streams_finish if remote EOF before inbound EOF
     if (_receiver.stream_out().eof() && !_sender.stream_in().eof()) {
