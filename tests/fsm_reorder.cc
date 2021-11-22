@@ -120,7 +120,7 @@ int main() {
             }
 
             test_2.execute(Tick(1));
-            test_2.execute(ExpectData{}.with_data(d), "test 1 failed: got back the wrong data");
+            test_2.execute(ExpectData{}.with_data(d), "test 2 failed: got back the wrong data");
         }
     } catch (const exception &e) {
         cerr << e.what() << endl;
