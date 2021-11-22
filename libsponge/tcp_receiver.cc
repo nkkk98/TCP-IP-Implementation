@@ -45,7 +45,8 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
     if (all_fill && seg.header().fin) {  // only when fin also fall in the window
         fin_abs_seq = abs_seqno + seg.length_in_sequence_space();
     }
-    _reassembler.push_substring(data, abs_seqno-1, header.fin);
+    uint64_t stream_indices = abs_seqno > 0 ? abs_seqno - 1 : 0;
+    _reassembler.push_substring(data, abs_seqno-1, stream_indices + seg.payload().size() + 2 == fin_abs_seq);
 
     return true;
     /*
