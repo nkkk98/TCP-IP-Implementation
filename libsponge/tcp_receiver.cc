@@ -11,10 +11,10 @@ void DUMMY_CODE(Targs &&...  unused ) {}*/
 using namespace std;
 
 bool TCPReceiver::segment_received(const TCPSegment &seg) {
-    uint64_t old_abs_ackno = 0;
+    /*uint64_t old_abs_ackno = 0;
     if (read_isn) {
         old_abs_ackno = abs_ackno();
-    }
+    }*/
     TCPHeader header=seg.header();
     Buffer payload=seg.payload();
     const string data= payload.copy();
@@ -28,7 +28,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
 
     
     const uint64_t abs_seqno=unwrap(header.seqno+header.syn, isn, last_assem);
-    uint64_t old_window_size = window_size();
+    //uint64_t old_window_size = window_size();
     // ACK after FIN should be received
     if (fin_abs_seq && abs_seqno >= fin_abs_seq && seg.length_in_sequence_space() == 0) {
         return true;
