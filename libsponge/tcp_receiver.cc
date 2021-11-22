@@ -35,7 +35,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         return true;
     }
     
-    if(read_isn&&(this->ackno()>old_abs_ackno||last_assem==0))_reassembler.push_substring(data, abs_seqno-1, header.fin);
+    if(read_isn&&((ackno()>old_abs_ackno)||last_assem==0))_reassembler.push_substring(data, abs_seqno-1, header.fin);
 
     if (!(abs_seqno < old_abs_ackno + old_window_size && abs_seqno + seg.length_in_sequence_space() > old_abs_ackno)) {
         // Not overlap with the window. but if it's a ack only, it's accepted.
