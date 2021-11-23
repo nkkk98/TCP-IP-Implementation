@@ -41,5 +41,4 @@ Network Interface处理
 * 要发送的Internet Datagram
 封装Ethernet头（MAC地址），发送。
 
-<img width="617" alt="Image" src="https://user-images.githubusercontent.com/28896013/142985300-946d049d-c023-4579-a536-aa5747cf820a.png">
-
+<img width="204" alt="Image2" src="https://user-images.githubusercontent.com/28896013/142985463-a1912904-3703-4f5f-bed8-025ebea7766c.png">
