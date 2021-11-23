@@ -1,6 +1,7 @@
 # 自己实现TCP Socket
 
 Socket对程序来说与文件或输入输出流类似。TCP确保了数据的正确传输。
+<img width="617" alt="Image" src="https://user-images.githubusercontent.com/28896013/142985187-97b0d26f-332b-4f6f-9a60-b8b3cecf7ddf.png">
 
 ## lab1：
 to create a reliable byte-stream out of not-so-reliable datagrams.
@@ -39,4 +40,6 @@ Network Interface处理
 是ARP：更新表。返回一个arp_frame。
 * 要发送的Internet Datagram
 封装Ethernet头（MAC地址），发送。
+
+<img width="617" alt="Image" src="https://user-images.githubusercontent.com/28896013/142985300-946d049d-c023-4579-a536-aa5747cf820a.png">
 
