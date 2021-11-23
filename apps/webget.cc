@@ -8,7 +8,7 @@ using namespace std;
 
 void get_URL(const string &host, const string &path) {
     // Your code here.
-    CS144TCPSocket sock;
+    FullStackSocket sock;
     sock.connect(Address(host,"http"));
     // You will need to connect to the "http" service on
     // the computer whose name is in the "host" string,
