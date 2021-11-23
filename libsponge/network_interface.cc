@@ -47,8 +47,7 @@ void NetworkInterface::send_datagram(const InternetDatagram &dgram, const Addres
 
 //! \param[in] frame the incoming Ethernet frame
 optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &frame) {
-    if (_ethernet_address_equal(frame.header().dst, ETHERNET_BROADCAST) ||
-        _ethernet_address_equal(frame.header().dst, _ethernet_address)) {
+    if (_ethernet_address_equal(frame.header().dst, ETHERNET_BROADCAST) || _ethernet_address_equal(frame.header().dst, _ethernet_address)) {
 
         if (frame.header().type == EthernetHeader::TYPE_IPv4) {
             InternetDatagram dgram;
@@ -97,6 +96,7 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
                     break;
                 }
             }
+        }
         }
     }
     return nullopt;
